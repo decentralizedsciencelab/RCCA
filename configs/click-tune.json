@@ -1,0 +1,160 @@
+{
+ "repo": "click",
+ "full_name": "pallets/click",
+ "package_root": "src/click",
+ "checkout": "corpus/repos/click",
+ "out": "corpus/click-tune",
+ "cutoff": "2026-06-01T00:00:00Z",
+ "freeze_salt": "UNFROZEN-replace-at-freeze",
+ "cwe_share": 0.5,
+ "covered_share": 0.5,
+ "coverage_json": "corpus/click/cov.json",
+ "cwe_catalog": "configs/cwe_click.json",
+ "held_out_families": [],
+ "gold_patch_dev": false,
+ "author_prompt": "configs/author_prompt.md",
+ "authors": [
+  {
+   "mode": "m0",
+   "cmd": [
+    "claude",
+    "-p",
+    "{prompt}",
+    "--permission-mode",
+    "auto",
+    "--allowedTools",
+    "Edit,Write,Bash",
+    "--tools",
+    "Bash,Read,Edit,Write",
+    "--disallowedTools",
+    "WebSearch,WebFetch",
+    "--output-format",
+    "stream-json",
+    "--verbose",
+    "--add-dir",
+    ".",
+    "--model",
+    "claude-fable-5-1",
+    "--setting-sources",
+    "project",
+    "--no-session-persistence",
+    "--strict-mcp-config",
+    "--disable-slash-commands"
+   ],
+   "model": "claude-fable-5-1",
+   "version": "2.1.304 (Claude Code)",
+   "timeout": 1800,
+   "auth_env": "ANTHROPIC_API_KEY"
+  },
+  {
+   "mode": "m1",
+   "cmd": [
+    "codex",
+    "exec",
+    "-C",
+    ".",
+    "-s",
+    "workspace-write",
+    "--ephemeral",
+    "--skip-git-repo-check",
+    "--json",
+    "-o",
+    "{last_message}",
+    "-m",
+    "gpt-6.1-sol",
+    "--ignore-user-config",
+    "--ignore-rules",
+    "-c",
+    "web_search=\"disabled\"",
+    "--disable",
+    "apps",
+    "{prompt}"
+   ],
+   "model": "gpt-6.1-sol",
+   "version": "codex-cli 0.163.0",
+   "timeout": 1800,
+   "write_back_auth": false
+  }
+ ],
+ "_authors_note": "2026-10-22 design simplification (PI): one authoring agent, m0 = Claude Code with claude-fable-5-1. The codex mode m1 (gpt-6.1-sol) was retired before the seal; its attempts remain under authored/ as history and enter no analysis. The approach is model-agnostic; a second agent (Qwen2.5-72B on the VHPC cluster) is a planned extension, not part of this run.",
+ "env": {
+  "python_version": "3.10",
+  "dependency_files": [
+   "pyproject.toml",
+   "setup.py",
+   "setup.cfg",
+   "requirements/*.txt",
+   "requirements*.txt",
+   "uv.lock"
+  ],
+  "exclude_newer": "dependency-change",
+  "install": [
+   {
+    "if": "requirements/tests.txt",
+    "args": [
+     "-e",
+     ".",
+     "-r",
+     "requirements/tests.txt"
+    ]
+   },
+   {
+    "if": "uv.lock",
+    "args": [
+     "-e",
+     ".",
+     "--group",
+     "tests"
+    ]
+   }
+  ],
+  "tools": {
+   "pytest": "9.0.2",
+   "coverage": "7.16.2",
+   "hypothesis": "6.168.5",
+   "bandit": "1.9.4",
+   "griffe": "2.3.0",
+   "import-linter": "2.15",
+   "atheris": "2.2.2"
+  },
+  "host_tools": {
+   "semgrep": "1.181.0",
+   "hypothesis": "6.168.5"
+  }
+ },
+ "_env_note": "env (corpus/envs.py): one environment per base commit, shared by commits whose dependency files are identical; battery_cmd names its interpreter with {python}. The install steps follow the commit's own manifests: requirements/tests.txt until click switched to uv in May 2025 (base commits of 2025-05-11 and 2025-05-20 in corpus/click/tasks.dev.jsonl sit on either side), the tests dependency group (uv.lock) after; the March and April 2020 base commits there (setup.py only; the June 2020 ones carry requirements/tests.txt) have no environment, and pairs records them as not admitted. exclude_newer dependency-change resolves the steps as of the last commit that changed a dependency file, so unpinned dependencies take that date's releases, not today's. The tools are the study's pins (those of configs/flask.json), installed last and without the cutoff. host_tools pins the two tools that run outside the environment: semgrep, which F2 runs from a venv of its own (corpus.envs.ensure_tool), because semgrep 1.181.0 requires click~=8.4.2 and would replace the click under test, here the editable checkout itself; and hypothesis, which generates and shrinks ch.property's inputs in the orchestrator (requirements-dev.txt pins the same version). Under a freeze record evidence.run refuses either at another version.",
+ "battery_cmd": [
+  "{python}",
+  "-m",
+  "pytest",
+  "tests",
+  "-q",
+  "-x",
+  "--no-header",
+  "-p",
+  "no:cacheprovider"
+ ],
+ "oracle_cmd": [
+  "{python}",
+  "-m",
+  "corpus.oracle",
+  "--config",
+  "configs/click.json",
+  "--candidate",
+  "{candidate}",
+  "--mode",
+  "{mode}"
+ ],
+ "oracle_battery": "oracle/click",
+ "tests_dir": "tests",
+ "_oracle_note": "oracle_cmd is the hidden injecting oracle (corpus.oracle; Sec. sec:pool, RQ1 setup spec Secs. 5-6): {python} is the base commit's interpreter, {candidate} the candidate id and {mode} battery for admission (a) or catch for (b), filled per candidate by corpus.build pairs; exit 0 means passed or caught, and every run writes corpus/<repo>/oracle/<candidate_id>.json. Admission (a) is battery_cmd, the repository's own suite under the base commit's interpreter (CI's half), and then the hidden battery on the safe variant: oracle_battery (oracle/<repo>/test_battery_*.py below the shared oracle/conftest.py, kept outside the checkout) plus the gold patch's added or modified tests under tests_dir (base_commit..merge_commit, read from the clone's history), evaluated differentially, so a battery test failing at the base commit is excluded for that candidate and listed in the admission row's battery_excluded, never a rejection, and a failing gold test rejects with its own reason, gold_tests_fail. Admission (b) is the battery failing on the unsafe twin where it passes on the safe one, or the AST scanner (corpus.oracle_scanner, disjoint from F2's rules) flagging the seeded site, or twin differential execution of the battery's observations diverging; the row's caught_by names which. Nothing of the oracle is ever written into the checkout or reaches a producer's Context.",
+ "_catalog_note": "cwe_catalog for click is not written yet; CWE seeding falls back to mutation until it exists",
+ "_note": "DEVELOPMENT STATE: freeze_salt is unfrozen (the freeze record's salt replaces it), and cwe_share and covered_share carry defaults, not frozen values. gold_patch_dev is false: `author` runs the two CLI agents of _authors_note, and admission runs the hidden oracle of _oracle_note (configs/flask.dev.json keeps the gold-patch plumbing and no oracle). cwe_catalog for click is Task 8's, and until it exists seeding is mutation only and the click battery covers the core modules alone (oracle/click/).",
+ "partition_fractions": [
+  0.3333,
+  0.1667,
+  0.5
+ ],
+ "pr_limit": 6000,
+ "_tune_run": "2026-10-24: tune partition authored with m0 (claude) and m1 (codex, gpt-6.1-sol) after unblinding. Exploratory: the tune partition was dropped before the seal (freeze.json _design_simplification) and is reopened here. Separate out so the sealed confirmatory artefacts under corpus/<repo> are untouched."
+}

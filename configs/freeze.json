@@ -1,0 +1,217 @@
+{
+  "_note": "Freeze record (rcca.freeze). Stages in order: dev, pre-freeze, frozen, unblinded. At stage dev nothing is frozen and every output directory must end in -dev. `python -m rcca.freeze init` draws the salt once (secrets.token_hex(16)) and moves the record to pre-freeze; `python -m rcca.freeze validate` lists what is still unfrozen; `python -m rcca.freeze seal` pins freeze_id to this record and the configs it lists. cost_weights are the w_j of C_w over tokens, tool calls and CI-equivalents (three positive numbers summing to 1; equal by default), a protocol constant fixed now and sealed. m_S, ceilings, nominal_costs, loss.tau_qual and loss.eta are filled at stage frozen from the training and tuning partitions: ceilings and nominal_costs by pasting analysis/ceilings.json and analysis/nominal_costs.json from a run fitted on the training partition (each action's nominal cost is the per-dimension median of its training records; policies select on it and are charged the realized cost after acquiring); unblinded needs all of them and signed: true. min_tasks (eligible tasks over all repositories: 180 analyzed plus 30 % for attrition) and min_tasks_per_repo (each repository) are the task-frame thresholds: `python -m corpus.build select` removes excluded_tasks before partitioning, writes corpus/<repo>/census.json and exits 3 below min_tasks_per_repo, and `python -m corpus.build census` exits 3 when the repositories together fall below min_tasks (plan Review Focus 3).",
+  "freeze_id": "1be24755677d90ef",
+  "stage": "unblinded",
+  "signed": true,
+  "created": "2026-10-22T02:55:47Z",
+  "salt": "d1fd82da2193964151c24b4fc7c34548",
+  "repos": [
+    "configs/flask.json",
+    "configs/click.json"
+  ],
+  "evidence_configs": [
+    "configs/evidence_flask.json",
+    "configs/evidence_click.json"
+  ],
+  "knobs": {
+    "cwe_share": 0.5,
+    "covered_share": 0.5
+  },
+  "loss": {
+    "kappa": 100,
+    "lambda_R": 10,
+    "lambda_E": 8,
+    "s_tilde": 0.6,
+    "tau_qual": 0.1,
+    "eta": 0.5
+  },
+  "cost_weights": [
+    0.3333333333333333,
+    0.3333333333333333,
+    0.3333333333333333
+  ],
+  "m_S": 0.05,
+  "ceilings": {
+    "q30": {
+      "tokens": 1.0,
+      "tool_calls": 16.0,
+      "ci_equiv": 1.7294849999999997
+    },
+    "q60": {
+      "tokens": 1.0,
+      "tool_calls": 25.199999999999996,
+      "ci_equiv": 3.8543339999999997
+    },
+    "q90": {
+      "tokens": 1.0,
+      "tool_calls": 39.0,
+      "ci_equiv": 19.351778999999997
+    }
+  },
+  "nominal_costs": {
+    "f1.repo_ci": {
+      "tokens": 0.0,
+      "tool_calls": 2.0,
+      "ci_equiv": 0.91841,
+      "wall_s": 2.5871500000000003
+    },
+    "f2.static_security": {
+      "tokens": 0.0,
+      "tool_calls": 2.0,
+      "ci_equiv": 0.40395000000000003,
+      "wall_s": 1.9649
+    },
+    "f2.dependency": {
+      "tokens": 0.0,
+      "tool_calls": 0.0,
+      "ci_equiv": 0.0,
+      "wall_s": 0.0001
+    },
+    "f3.api_contract": {
+      "tokens": 0.0,
+      "tool_calls": 1.0,
+      "ci_equiv": 0.057845,
+      "wall_s": 0.3519
+    },
+    "f4.impact_revert": {
+      "tokens": 0.0,
+      "tool_calls": 3.0,
+      "ci_equiv": 0.00876,
+      "wall_s": 0.11685000000000001
+    },
+    "ch.property": {
+      "tokens": 0.0,
+      "tool_calls": 4.0,
+      "ci_equiv": 0.16621,
+      "wall_s": 1.4140000000000001
+    },
+    "ch.fuzz": {
+      "tokens": 0.0,
+      "tool_calls": 1.0,
+      "ci_equiv": 0.032475000000000004,
+      "wall_s": 0.26234999999999997
+    },
+    "ch.differential": {
+      "tokens": 0.0,
+      "tool_calls": 4.0,
+      "ci_equiv": 0.360135,
+      "wall_s": 2.3156499999999998
+    }
+  },
+  "producers": [
+    "f1.repo_ci",
+    "f2.static_security",
+    "f2.dependency",
+    "f3.api_contract",
+    "f4.impact_revert",
+    "ch.property",
+    "ch.differential",
+    "ch.fuzz"
+  ],
+  "authors": {
+    "m0": {
+      "cli": "claude",
+      "model": "claude-fable-5-1",
+      "version": "2.1.304 (Claude Code)",
+      "prompt": "configs/author_prompt.md",
+      "auth": "API key named by auth_env=ANTHROPIC_API_KEY from the operator's .env (never committed, never recorded by value) from 2026-10-22; the training partition was authored on the CLI's subscription login; same CLI, same model, only the billing route differs"
+    }
+  },
+  "oracle": {
+    "flask": {
+      "battery": "oracle/flask",
+      "battery_digest": "52759baef8b8b838ffb2c3a984a0619a787c8cd2c735f36c156672b6b3bb4e2c",
+      "battery_digest_as_run": "52759baef8b8b838",
+      "scanner_digest_as_run": "368f19e9d7cfd351",
+      "interface": "corpus.oracle --mode catch|battery, twin-differential"
+    },
+    "click": {
+      "battery": "oracle/click",
+      "battery_digest": "f211e610c7cecbf480600489b85c08390e677273cd621ccabc1022b39de00a40",
+      "battery_digest_as_run": "f211e610c7cecbf4",
+      "scanner_digest_as_run": "368f19e9d7cfd351",
+      "interface": "corpus.oracle --mode catch|battery, twin-differential"
+    }
+  },
+  "excluded_tasks": [
+    "flask-2410",
+    "flask-4069",
+    "flask-4082",
+    "flask-4093",
+    "flask-4150",
+    "flask-4170",
+    "flask-4229",
+    "flask-4453",
+    "flask-4476",
+    "flask-4485",
+    "flask-4559",
+    "flask-4567",
+    "flask-4570",
+    "flask-4605",
+    "flask-4740",
+    "flask-4777",
+    "flask-4831",
+    "flask-4892",
+    "flask-4989",
+    "flask-5004",
+    "flask-5160",
+    "flask-5230",
+    "flask-5322",
+    "flask-5377",
+    "flask-5381",
+    "flask-5388",
+    "flask-5391",
+    "flask-5476",
+    "flask-5499",
+    "flask-5504",
+    "flask-5526",
+    "flask-5620",
+    "flask-5623",
+    "flask-5625",
+    "flask-5626",
+    "flask-5630",
+    "flask-5632",
+    "flask-5634",
+    "flask-5636",
+    "flask-5637",
+    "flask-5638",
+    "flask-5774",
+    "flask-5786",
+    "flask-5815",
+    "flask-5816"
+  ],
+  "min_tasks": 234,
+  "min_tasks_per_repo": 65,
+  "tool_digests": {
+    "f1.repo_ci": "f1_tests.py:98147aac817f79e0",
+    "f2.static_security": "f2_static.py:50c4188157b69a65",
+    "f2.dependency": "f2_deps.py:93f8779b0c2a5a42",
+    "f3.api_contract": "f3_contracts.py:bbacbbca4d730c75",
+    "f4.impact_revert": "f4_impact.py:243ee615a4155807",
+    "ch.property": "property.py:948988713516a95f",
+    "ch.differential": "differential.py:f690f9af0c1b29c7",
+    "ch.fuzz": "fuzz.py:8d41b57cd19f7906"
+  },
+  "_min_tasks_per_repo_note": "78 -> 65 on 2026-10-22, PI decision on docs/findings/2026-10-22-flask-frame-below-floor.md: flask's viable frame under the pinned interpreter is 65; the primary keeps 0.84-0.87 power at the projected 87 analyzed tasks and U_CI 0.09; the flask-only estimate is reported with its wider interval",
+  "_design_simplification": {
+    "date": "2026-10-22",
+    "by": "PI",
+    "changes": [
+      "one authoring agent (m0, Claude Code); the codex mode retired before the seal",
+      "severity weights are the rubric's class anchors (CWE: its anchor; mutation: the C1 anchor), not adjudicated scores; L is class-weighted unsafe acceptance; no LLM judges, no escalations",
+      "no tuning partition: eta = 0.5 and tau_qual = 0.1 fixed from the development rehearsal (docs/findings/2026-10-21-tuning-feasibility.md), disclosed like lambda_E",
+      "one evidence repetition instead of three"
+    ],
+    "claim": "results are for changes authored by Claude Code; the approach is model-agnostic; a second agent (Qwen2.5-72B, in-house) is a planned extension"
+  },
+  "_test_cap": {
+    "date": "2026-10-22",
+    "by": "PI",
+    "cap": 80,
+    "flask": 21,
+    "click": 59,
+    "rule": "the test partition is reduced before the seal to the first N tasks per repository in the order of sha256(salt:task), N in proportion to each repository's test frame; the uncapped frames are kept as tasks_test_uncapped_old.jsonl; the tasks removed are never authored",
+    "cost": "power at the single-agent admission rate falls from about 0.77 to about 0.55 for a halving of U_CI"
+  },
+  "_unblinded": "2026-10-22: the test partition is opened once, under the constants as recorded; the training partitions predict the gate is not met at them (docs/findings/2026-10-22-training-two-repos.md)"
+}

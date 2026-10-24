@@ -1,0 +1,81 @@
+{
+  "freeze_salt": "DEV-NOT-FROZEN",
+  "python": "~/repos/flask/.venv/bin/python",
+  "ci_baseline": "corpus/flask-dev/ci_baseline.json",
+  "f1": {
+    "test_args": [
+      "tests"
+    ],
+    "source": "flask",
+    "extra_deselect": [
+      "tests/test_reqctx.py::test_bad_environ_raises_bad_request"
+    ]
+  },
+  "f2_static": {
+    "semgrep_rules": [],
+    "target": "src",
+    "k": 1
+  },
+  "f2_deps": {
+    "snapshot": "corpus/flask-dev/registry_snapshot.json",
+    "advisories": "corpus/flask-dev/advisories.json"
+  },
+  "f3": {
+    "package": "flask",
+    "search": "src",
+    "k": 1
+  },
+  "f4": {
+    "top_module": "flask",
+    "tests_dir": "tests"
+  },
+  "challenger": {
+    "python": "~/repos/flask/.venv/bin/python",
+    "search": "src",
+    "budget_ci_equiv": 12.44,
+    "max_targets": 4,
+    "k": 2,
+    "call_timeout": 5,
+    "techniques": [
+      "property",
+      "differential"
+    ],
+    "max_examples": 80,
+    "test_args": [
+      "tests",
+      "--deselect",
+      "tests/test_reqctx.py::test_bad_environ_raises_bad_request"
+    ],
+    "suite_timeout": 120,
+    "minimize_budget": 60,
+    "factories": {
+      "Flask": [
+        "importlib.import_module('flask').Flask('rcca_probe')",
+        "(lambda app: (app.config.update(SECRET_KEY='rcca-k', SESSION_COOKIE_NAME='s', SESSION_COOKIE_DOMAIN='example.com', SESSION_COOKIE_PATH='/p', SESSION_COOKIE_HTTPONLY=False, SESSION_COOKIE_SECURE=True, SESSION_COOKIE_SAMESITE='Strict', SESSION_COOKIE_PARTITIONED=True, PERMANENT_SESSION_LIFETIME=5, SESSION_REFRESH_EACH_REQUEST=False, SERVER_NAME='example.com', APPLICATION_ROOT='/app', PREFERRED_URL_SCHEME='https', TESTING=True, MAX_CONTENT_LENGTH=1024, MAX_FORM_MEMORY_SIZE=512, MAX_FORM_PARTS=10, TRUSTED_HOSTS=['example.com']), app)[1])(importlib.import_module('flask').Flask('rcca_probe'))"
+      ],
+      "App": [
+        "importlib.import_module('flask').Flask('rcca_probe')",
+        "(lambda app: (app.config.update(SECRET_KEY='rcca-k', SESSION_COOKIE_NAME='s', SESSION_COOKIE_DOMAIN='example.com', SESSION_COOKIE_PATH='/p', SESSION_COOKIE_HTTPONLY=False, SESSION_COOKIE_SECURE=True, SESSION_COOKIE_SAMESITE='Strict', SESSION_COOKIE_PARTITIONED=True, PERMANENT_SESSION_LIFETIME=5, SESSION_REFRESH_EACH_REQUEST=False, SERVER_NAME='example.com', APPLICATION_ROOT='/app', PREFERRED_URL_SCHEME='https', TESTING=True, MAX_CONTENT_LENGTH=1024, MAX_FORM_MEMORY_SIZE=512, MAX_FORM_PARTS=10, TRUSTED_HOSTS=['example.com']), app)[1])(importlib.import_module('flask').Flask('rcca_probe'))"
+      ],
+      "Blueprint": "importlib.import_module('flask').Blueprint('rcca_bp', 'rcca_bp')",
+      "Request": [
+        "importlib.import_module('flask').Request(importlib.import_module('werkzeug.test').EnvironBuilder(path='/').get_environ())",
+        "importlib.import_module('flask').Request(importlib.import_module('werkzeug.test').EnvironBuilder(path='/p/q?x=1', method='POST', data={'a': 'b'}, headers={'Host': 'example.com', 'Cookie': 's=v'}).get_environ())"
+      ],
+      "Response": [
+        "importlib.import_module('flask').Response('ok')",
+        "importlib.import_module('flask').Response(b'', status=204, headers={'X-RCCA': '1'})"
+      ],
+      "SessionMixin": [
+        "importlib.import_module('flask.sessions').SecureCookieSession()",
+        "importlib.import_module('flask.sessions').SecureCookieSession({'k': 'v', '_permanent': True})"
+      ],
+      "SecureCookieSession": [
+        "importlib.import_module('flask.sessions').SecureCookieSession()",
+        "importlib.import_module('flask.sessions').SecureCookieSession({'k': 'v', '_permanent': True})"
+      ],
+      "Config": "importlib.import_module('flask').Config('.')"
+    }
+  },
+  "_note": "DEV ONLY: bandit without semgrep, short challenger budget, no fuzzing. challenger.budget_ci_equiv is in standard-CI equivalents: 12.44 x this directory's baseline (2.009 s, corpus/flask-dev/ci_baseline.json) is about the former 25 s; call_timeout and suite_timeout stay in seconds (safety timeouts) and minimize_budget counts calls."
+}

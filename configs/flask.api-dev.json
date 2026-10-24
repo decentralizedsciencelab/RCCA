@@ -1,0 +1,134 @@
+{
+ "repo": "flask",
+ "full_name": "pallets/flask",
+ "package_root": "src/flask",
+ "checkout": "corpus/repos/flask",
+ "out": "corpus/flask-api-dev",
+ "cutoff": "2026-06-01T00:00:00Z",
+ "freeze_salt": "UNFROZEN-replace-at-freeze",
+ "cwe_share": 0.5,
+ "covered_share": 0.5,
+ "coverage_json": "corpus/flask-api-dev/cov.json",
+ "cwe_catalog": "configs/cwe_flask.json",
+ "held_out_families": [
+  "signing",
+  "path-traversal"
+ ],
+ "gold_patch_dev": false,
+ "author_prompt": "configs/author_prompt.md",
+ "authors": [
+  {
+   "mode": "m0",
+   "cmd": [
+    "claude",
+    "-p",
+    "{prompt}",
+    "--permission-mode",
+    "auto",
+    "--allowedTools",
+    "Edit,Write,Bash",
+    "--tools",
+    "Bash,Read,Edit,Write",
+    "--disallowedTools",
+    "WebSearch,WebFetch",
+    "--output-format",
+    "stream-json",
+    "--verbose",
+    "--add-dir",
+    ".",
+    "--model",
+    "claude-fable-5-1",
+    "--setting-sources",
+    "project",
+    "--no-session-persistence",
+    "--strict-mcp-config",
+    "--disable-slash-commands"
+   ],
+   "model": "claude-fable-5-1",
+   "version": "2.1.304 (Claude Code)",
+   "timeout": 1800,
+   "auth_env": "ANTHROPIC_API_KEY"
+  }
+ ],
+ "_authors_note": "2026-10-22 design simplification (PI): one authoring agent, m0 = Claude Code with claude-fable-5-1. The codex mode m1 (gpt-6.1-sol) was retired before the seal; its attempts remain under authored/ as history and enter no analysis. The approach is model-agnostic; a second agent (Qwen2.5-72B on the VHPC cluster) is a planned extension, not part of this run.",
+ "env": {
+  "python_version": "3.10",
+  "dependency_files": [
+   "pyproject.toml",
+   "setup.py",
+   "setup.cfg",
+   "requirements/*.txt",
+   "requirements*.txt",
+   "uv.lock"
+  ],
+  "exclude_newer": "dependency-change",
+  "install": [
+   {
+    "if": "requirements/tests.txt",
+    "args": [
+     "-e",
+     ".",
+     "-r",
+     "requirements/tests.txt"
+    ]
+   },
+   {
+    "if": "uv.lock",
+    "args": [
+     "-e",
+     ".",
+     "--group",
+     "tests"
+    ]
+   }
+  ],
+  "tools": {
+   "pytest": "9.0.2",
+   "coverage": "7.16.2",
+   "hypothesis": "6.168.5",
+   "bandit": "1.9.4",
+   "griffe": "2.3.0",
+   "import-linter": "2.15",
+   "atheris": "2.2.2"
+  },
+  "host_tools": {
+   "semgrep": "1.181.0",
+   "hypothesis": "6.168.5"
+  }
+ },
+ "_env_note": "env (corpus/envs.py): one environment per base commit, shared by commits whose dependency files are identical; battery_cmd names its interpreter with {python}. The install steps follow the commit's own manifests: requirements/tests.txt until flask switched to uv in May 2025 (0109e496, which removed it and added uv.lock), the tests dependency group after; a base commit with neither (setup.py only, before eea31f29 added requirements/tests.txt on 2020-05-23) has no environment, and pairs records it as not admitted. exclude_newer dependency-change resolves the steps as of the last commit that changed a dependency file, so the unpinned Werkzeug and click take that date's releases: at the January 2024 base of flask-5377 today's click 8.5 fails three CLI tests (CliRunner(mix_stderr=...) is gone) and click 8.1.7 passes. The tools are the study's pins, installed last and without the cutoff. atheris 2.2.2 is the newest release with a macOS arm64 Python 3.10 wheel (2.3.0 and later ship only an sdist there, which needs a libFuzzer clang). host_tools pins the two tools that run outside the environment: semgrep, which F2 runs from a venv of its own (corpus.envs.ensure_tool), because semgrep 1.181.0 requires click~=8.4.2 and would move the subject's click in either direction; and hypothesis, which generates and shrinks ch.property's inputs in the orchestrator (requirements-dev.txt pins the same version; the environment's copy serves only code that runs in the subject's interpreter). Under a freeze record evidence.run refuses either at another version.",
+ "battery_cmd": [
+  "{python}",
+  "-m",
+  "pytest",
+  "tests",
+  "-q",
+  "-x",
+  "--no-header",
+  "-p",
+  "no:cacheprovider",
+  "--deselect",
+  "tests/test_reqctx.py::test_bad_environ_raises_bad_request"
+ ],
+ "oracle_cmd": [
+  "{python}",
+  "-m",
+  "corpus.oracle",
+  "--config",
+  "configs/flask.api-dev.json",
+  "--candidate",
+  "{candidate}",
+  "--mode",
+  "{mode}"
+ ],
+ "oracle_battery": "oracle/flask",
+ "tests_dir": "tests",
+ "_oracle_note": "oracle_cmd is the hidden injecting oracle (corpus.oracle; Sec. sec:pool, RQ1 setup spec Secs. 5-6): {python} is the base commit's interpreter, {candidate} the candidate id and {mode} battery for admission (a) or catch for (b), filled per candidate by corpus.build pairs; exit 0 means passed or caught, and every run writes corpus/<repo>/oracle/<candidate_id>.json. Admission (a) is battery_cmd, the repository's own suite under the base commit's interpreter (CI's half), and then the hidden battery on the safe variant: oracle_battery (oracle/<repo>/test_battery_*.py below the shared oracle/conftest.py, kept outside the checkout) plus the gold patch's added or modified tests under tests_dir (base_commit..merge_commit, read from the clone's history), evaluated differentially, so a battery test failing at the base commit is excluded for that candidate and listed in the admission row's battery_excluded, never a rejection, and a failing gold test rejects with its own reason, gold_tests_fail. Admission (b) is the battery failing on the unsafe twin where it passes on the safe one, or the AST scanner (corpus.oracle_scanner, disjoint from F2's rules) flagging the seeded site, or twin differential execution of the battery's observations diverging; the row's caught_by names which. Nothing of the oracle is ever written into the checkout or reaches a producer's Context.",
+ "_note": "Stage-dev selection and build with the real PR API (corpus.tasks, GH_TOKEN). The freeze firewall requires an output ending in -dev at this stage, so this is not the confirmatory corpus: corpus/flask stays reserved for the run made under a sealed freeze record. corpus/flask-dev is the 2026-10-14 gold-patch dry run and is left untouched.",
+ "partition_fractions": [
+  0.3333,
+  0.1667,
+  0.5
+ ],
+ "pr_limit": 1600
+}

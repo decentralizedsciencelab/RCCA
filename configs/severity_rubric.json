@@ -1,0 +1,128 @@
+{
+  "_version": "2026-10-19-draft",
+  "_status": "PROPOSED. Bands are the author's CVSS-informed starting point; the PI signs off before freeze. The rubric is part of the freeze record and of the replication package (rcca.tex sec:oracle).",
+  "_scale": "w in [0,1]. Adjudicators choose a value inside the band for the defect's class; the band bounds judgment rather than replacing it.",
+  "_rules": {
+    "co_occurring": "max over all defects present in the candidate (rcca.tex sec:oracle)",
+    "unresolved": "an unresolved or contradictory case counts as unsafe at the top of its band",
+    "blinding": "adjudicators see the diff and the oracle report only; never the risk score, the evidence matrix, the policy, or the decision",
+    "annotators": 2,
+    "disagreement": "see docs/protocol/2026-10-19-severity-rubric.md \u00a74: inside-band gaps of at most half the band width are averaged, wider gaps are conferred then resolved to the higher score, and an out-of-band score, a class disagreement, a cannot-score or an unlisted CWE escalates to the PI"
+  },
+  "security_by_cwe": {
+    "CWE-347": {
+      "band": [
+        0.85,
+        0.95
+      ],
+      "anchor": 0.9,
+      "why": "signature verification bypassed: a forged session is accepted, so authentication is bypassed outright"
+    },
+    "CWE-489": {
+      "band": [
+        0.75,
+        0.9
+      ],
+      "anchor": 0.8,
+      "why": "active debug code in production exposes the Werkzeug interactive debugger, which permits code execution"
+    },
+    "CWE-22": {
+      "band": [
+        0.7,
+        0.85
+      ],
+      "anchor": 0.75,
+      "why": "path traversal: arbitrary file read within the server's privileges"
+    },
+    "CWE-327": {
+      "band": [
+        0.6,
+        0.8
+      ],
+      "anchor": 0.7,
+      "why": "broken cryptographic primitive; forgery is work-bounded rather than free"
+    },
+    "CWE-79": {
+      "band": [
+        0.55,
+        0.75
+      ],
+      "anchor": 0.65,
+      "why": "stored or reflected script injection in rendered output"
+    },
+    "CWE-614": {
+      "band": [
+        0.35,
+        0.55
+      ],
+      "anchor": 0.45,
+      "why": "session cookie transmissible in cleartext; requires a network position"
+    },
+    "CWE-1004": {
+      "band": [
+        0.35,
+        0.55
+      ],
+      "anchor": 0.45,
+      "why": "session cookie readable from script; requires a separate injection foothold"
+    },
+    "CWE-1275": {
+      "band": [
+        0.25,
+        0.45
+      ],
+      "anchor": 0.35,
+      "why": "SameSite dropped: enables cross-site request forgery, which further controls may still stop"
+    },
+    "CWE-613": {
+      "band": [
+        0.25,
+        0.45
+      ],
+      "anchor": 0.35,
+      "why": "insufficient session expiration widens the window of a stolen credential"
+    }
+  },
+  "mutation_by_consequence": {
+    "C1_wrong_result_public": {
+      "band": [
+        0.4,
+        0.6
+      ],
+      "anchor": 0.5,
+      "why": "a public API path returns a silently wrong result on a valid input"
+    },
+    "C2_crash_valid_input": {
+      "band": [
+        0.25,
+        0.45
+      ],
+      "anchor": 0.35,
+      "why": "unhandled exception on a valid input: loud, so detected early, but a denial of service"
+    },
+    "C3_wrong_result_edge": {
+      "band": [
+        0.1,
+        0.3
+      ],
+      "anchor": 0.2,
+      "why": "wrong result only on an input no public API path reaches"
+    },
+    "C4_resource_only": {
+      "band": [
+        0.05,
+        0.15
+      ],
+      "anchor": 0.1,
+      "why": "measurably worse time or memory, no wrong result"
+    },
+    "C5_no_observable_consequence": {
+      "band": [
+        0.0,
+        0.0
+      ],
+      "anchor": 0.0,
+      "why": "equivalent mutant: the candidate is dropped from the pool, not labelled unsafe"
+    }
+  }
+}

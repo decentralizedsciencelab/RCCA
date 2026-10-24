@@ -1,0 +1,102 @@
+[
+  {
+    "id": "C01",
+    "cwe": "CWE-549",
+    "family": "credential-exposure",
+    "description": "Hidden prompt echoes the input",
+    "file": "termui.py",
+    "find": "        f = hidden_prompt_func if hide_input else visible_prompt_func",
+    "replace": "        f = visible_prompt_func",
+    "held_out": false
+  },
+  {
+    "id": "C02",
+    "cwe": "CWE-20",
+    "family": "input-validation",
+    "description": "Path(exists=True) accepts a path that does not exist",
+    "file": "types.py",
+    "find": "                if not self.exists:",
+    "replace": "                if True:  # exists is not enforced",
+    "held_out": true
+  },
+  {
+    "id": "C03",
+    "cwe": "CWE-20",
+    "family": "input-validation",
+    "description": "IntRange and FloatRange bounds not enforced",
+    "file": "types.py",
+    "find": "        if lt_min or gt_max:",
+    "replace": "        if False:  # bounds not enforced",
+    "held_out": false
+  },
+  {
+    "id": "C04",
+    "cwe": "CWE-20",
+    "family": "input-validation",
+    "description": "Choice accepts a value outside its choices",
+    "file": "types.py",
+    "find": "        except StopIteration:",
+    "replace": "        except StopIteration:\n            return value  # type: ignore[return-value]",
+    "held_out": false
+  },
+  {
+    "id": "C05",
+    "cwe": "CWE-20",
+    "family": "input-validation",
+    "description": "Path(dir_okay=False) accepts a directory",
+    "file": "types.py",
+    "find": "            if not self.dir_okay and stat.S_ISDIR(st.st_mode):",
+    "replace": "            if False and stat.S_ISDIR(st.st_mode):",
+    "held_out": false
+  },
+  {
+    "id": "C06",
+    "cwe": "CWE-22",
+    "family": "path-traversal",
+    "description": "Path(resolve_path=True) leaves the path unresolved",
+    "file": "types.py",
+    "find": "                rv = os.path.realpath(rv)",
+    "replace": "                rv = rv  # resolve_path is a no-op",
+    "held_out": true
+  },
+  {
+    "id": "C07",
+    "cwe": "CWE-732",
+    "family": "access-check",
+    "description": "Path(readable=True) does not check readability",
+    "file": "types.py",
+    "find": "            if self.readable and not os.access(rv, os.R_OK):",
+    "replace": "            if False and not os.access(rv, os.R_OK):",
+    "held_out": false
+  },
+  {
+    "id": "C08",
+    "cwe": "CWE-732",
+    "family": "access-check",
+    "description": "Path(writable=True) does not check writability",
+    "file": "types.py",
+    "find": "            if self.writable and not os.access(rv, os.W_OK):",
+    "replace": "            if False and not os.access(rv, os.W_OK):",
+    "held_out": false
+  },
+  {
+    "id": "C09",
+    "cwe": "CWE-150",
+    "family": "output-neutralization",
+    "description": "ANSI escapes are not stripped for a non-terminal sink",
+    "file": "utils.py",
+    "find": "        out = strip_ansi(out)",
+    "replace": "        pass  # escapes reach the sink verbatim",
+    "held_out": false
+  },
+  {
+    "id": "C10",
+    "cwe": "CWE-1188",
+    "family": "insecure-default",
+    "description": "confirm() defaults to yes",
+    "file": "termui.py",
+    "find": "    default: bool | None = False,",
+    "replace": "    default: bool | None = True,",
+    "held_out": false
+  }
+]

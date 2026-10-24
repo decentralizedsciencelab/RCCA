@@ -1,0 +1,15 @@
+rules:
+  - id: rcca-test-eval-use
+    pattern: eval(...)
+    message: eval on untrusted input
+    languages: [python]
+    severity: ERROR
+    metadata:
+      cwe: "CWE-78: Improper Neutralization of Special Elements used in an OS Command"
+  - id: rcca-test-md5
+    pattern: hashlib.md5(...)
+    message: weak hash
+    languages: [python]
+    severity: WARNING
+    metadata:
+      cwe: "CWE-327: Use of a Broken or Risky Cryptographic Algorithm"

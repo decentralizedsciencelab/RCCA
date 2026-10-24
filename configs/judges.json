@@ -1,0 +1,22 @@
+[
+ {"name": "claude-fable", "vendor": "anthropic", "author_mode": "m0", "model": "claude-fable-5-1",
+  "version": "2.1.304 (Claude Code)", "timeout": 600,
+  "cmd": ["claude", "-p", "{prompt}", "--output-format", "text", "--model", "claude-fable-5-1",
+          "--disallowedTools", "Bash,Edit,Write,WebSearch,WebFetch", "--setting-sources", "project",
+          "--no-session-persistence", "--strict-mcp-config", "--disable-slash-commands"]},
+ {"name": "codex-6.1", "vendor": "openai", "author_mode": "m1", "model": "gpt-6.1-sol",
+  "version": "codex-cli 0.163.0", "timeout": 600,
+  "cmd": ["codex", "exec", "-C", ".", "-s", "read-only", "--ephemeral", "--skip-git-repo-check", "-o", "{last_message}",
+          "-m", "gpt-6.1-sol", "--ignore-user-config", "--ignore-rules", "-c", "web_search=\"disabled\"",
+          "--disable", "apps", "{prompt}"]},
+ {"name": "claude-sonnet", "vendor": "anthropic", "author_mode": null, "model": "claude-sonnet-5",
+  "version": "2.1.304 (Claude Code)", "timeout": 600,
+  "cmd": ["claude", "-p", "{prompt}", "--output-format", "text", "--model", "claude-sonnet-5",
+          "--disallowedTools", "Bash,Edit,Write,WebSearch,WebFetch", "--setting-sources", "project",
+          "--no-session-persistence", "--strict-mcp-config", "--disable-slash-commands"]},
+ {"name": "codex-5.6", "vendor": "openai", "author_mode": null, "model": "gpt-5.6-sol",
+  "version": "codex-cli 0.163.0", "timeout": 600,
+  "cmd": ["codex", "exec", "-C", ".", "-s", "read-only", "--ephemeral", "--skip-git-repo-check", "-o", "{last_message}",
+          "-m", "gpt-5.6-sol", "--ignore-user-config", "--ignore-rules", "-c", "web_search=\"disabled\"",
+          "--disable", "apps", "{prompt}"]}
+]

@@ -1,0 +1,78 @@
+{
+  "repo": "flask",
+  "full_name": "pallets/flask",
+  "package_root": "src/flask",
+  "checkout": "corpus/repos/flask",
+  "out": "corpus/flask-pilot",
+  "cutoff": "2026-06-01T00:00:00Z",
+  "freeze_salt": "PILOT-bef304f2230469f1",
+  "partition_fractions": [
+    0.3333,
+    0.1667,
+    0.5
+  ],
+  "cwe_share": 0.5,
+  "covered_share": 0.5,
+  "coverage_json": "corpus/flask/cov.json",
+  "cwe_catalog": "configs/cwe_flask.json",
+  "held_out_families": [
+    "signing",
+    "path-traversal"
+  ],
+  "gold_patch_dev": false,
+  "authors": [
+    {
+      "mode": "m0",
+      "cmd": [
+        "claude",
+        "-p",
+        "--permission-mode",
+        "acceptEdits",
+        "--allowedTools",
+        "Edit,Write,Read,Bash",
+        "--output-format",
+        "text",
+        "--model",
+        "claude-sonnet-5"
+      ],
+      "model": "claude-sonnet-5",
+      "version": "claude-code 2.1.292"
+    },
+    {
+      "mode": "m1",
+      "cmd": [
+        "codex",
+        "exec",
+        "-s",
+        "workspace-write",
+        "--ephemeral",
+        "--skip-git-repo-check",
+        "-m",
+        "gpt-5.6-sol"
+      ],
+      "model": "gpt-5.6-sol",
+      "version": "codex-cli 0.163.0"
+    }
+  ],
+  "battery_cmd": [
+    ".venv/bin/python",
+    "-m",
+    "pytest",
+    "tests",
+    "-q",
+    "-x",
+    "--no-header",
+    "-p",
+    "no:cacheprovider",
+    "--deselect",
+    "tests/test_reqctx.py::test_bad_environ_raises_bad_request"
+  ],
+  "oracle_cmd": [
+    ".venv/bin/python",
+    "{rcca_root}/evidence/oracle/flask_battery.py"
+  ],
+  "_oracle_note": "The injecting oracle of admission check (b): one behavioural check per defect in cwe_catalog, run with the candidate checkout as cwd so `flask` imports from the candidate. Nonzero exit means a violation was detected (expect_zero=False); the battery exits 0 when it cannot run, so a broken oracle admits nothing. It lives outside the checkout so no producer, challenger or policy can read it. Artifact-disjoint from the F2 rule sets and from flask's suite by construction: it has no patterns and reuses no test code. Covers all 10 catalog defects (tests/test_oracle.py); the regex SAST scanner the spec first proposed covers 0.",
+  "_note": "PILOT, not the confirmatory study. Real agents, real producers, real decisions, but: task selection is the history fallback rather than the PR API, the salt is a pilot salt and not a freeze, there is no blinded equivalence review, and severity comes from the rubric anchors rather than from two adjudicators. Nothing here may enter the paper's RQ1 tables. corpus/flask/ stays reserved for the frozen run.",
+  "_authors_note": "Authoring agents decided 2026-10-19 (setup spec D6). Both are API models through their vendor CLIs, so no API key enters the replication package; the open-weight arm of the original S4 is gone and the deviation is recorded in the spec. Shell capability is deliberately symmetric: codex's workspace-write sandbox permits model-generated shell, so claude carries Bash, and the mode factor contrasts vendors rather than tool access. Model IDs are pinned here rather than taken from local CLI config; the served weights behind an ID are not pinnable, which is a reproducibility limit to state in the paper.",
+  "history_fallback": true
+}

@@ -1,0 +1,36 @@
+{
+  "repo": "flask",
+  "full_name": "pallets/flask",
+  "package_root": "src/flask",
+  "top_module": "flask",
+  "checkout": "~/repos/flask",
+  "out": "corpus/flask-dev",
+  "cutoff": "2026-06-01T00:00:00Z",
+  "freeze_salt": "DEV-NOT-FROZEN",
+  "cwe_share": 0.5,
+  "covered_share": 0.5,
+  "coverage_json": "corpus/flask-dev/cov.json",
+  "cwe_catalog": "configs/cwe_flask.json",
+  "held_out_families": [
+    "signing",
+    "path-traversal"
+  ],
+  "gold_patch_dev": true,
+  "history_fallback": true,
+  "battery_cmd": [
+    ".venv/bin/python",
+    "-m",
+    "pytest",
+    "tests",
+    "-q",
+    "-x",
+    "--no-header",
+    "-p",
+    "no:cacheprovider",
+    "--deselect",
+    "tests/test_reqctx.py::test_bad_environ_raises_bad_request"
+  ],
+  "oracle_cmd": null,
+  "_note": "DEV ONLY: gold-patch authoring, history tasks, no oracle, unfrozen salt. Nothing produced with this config may feed the paper. pinned_commit is the state the standard-CI baseline is measured at.",
+  "pinned_commit": "3.1.0"
+}

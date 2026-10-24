@@ -1,0 +1,66 @@
+{
+ "freeze_salt": "UNFROZEN-replace-at-freeze",
+ "python": "corpus/repos/click/.venv/bin/python",
+ "ci_baseline": "corpus/click/ci_baseline.json",
+ "f1": {
+  "test_args": [
+   "tests"
+  ],
+  "source": "click",
+  "extra_deselect": [],
+  "timeout": 300
+ },
+ "f2_static": {
+  "semgrep_rules": [
+   "configs/semgrep_rules_click.yml"
+  ],
+  "target": "src",
+  "k": 2
+ },
+ "f2_deps": {
+  "snapshot": "corpus/click/registry_snapshot.json",
+  "advisories": "corpus/click/advisories.json"
+ },
+ "f3": {
+  "package": "click",
+  "search": "src",
+  "k": 2
+ },
+ "f4": {
+  "top_module": "click",
+  "tests_dir": "tests"
+ },
+ "_notes": [
+  "semgrep_rules files are the detector side of the circularity firewall; they must not contain any catalog anchor (tests/test_corpus.py checks configs/detector_patterns.txt)",
+  "registry_snapshot.json and advisories.json are taken at the freeze date and pinned by digest in the freeze record",
+  "python is used only with a repository config that has no env block; configs/click.json has one, so evidence.run and evidence.baseline run each candidate in its base commit's environment (corpus/envs.py), with the pinned pytest, coverage, bandit, griffe, import-linter and atheris. challenger.python, when set, gives the challenger's calls another interpreter; it is unset here, so they run in the same environment, which differs from the authoring agent's configuration as required. Two tools run outside that environment, pinned in the repository config's env.host_tools: hypothesis generates and shrinks ch.property's inputs in the orchestrator (requirements-dev.txt pins it; the environment's copy is not the one that searches), and semgrep runs from a venv of its own (corpus.envs.ensure_tool). Under a freeze record evidence.run refuses either at another version, and the F2 and ch.property records carry the version they ran with",
+  "challenger.factories maps an annotation's type name to an expression evaluated inside the executor of each tree; it covers parameters that are not JSON-able and is part of the frozen configuration",
+  "challenger.budget_ci_equiv (the search budget per invocation) and challenger.fuzz_time_per_target_ci_equiv are in standard-CI equivalents, not seconds: evidence.run converts them with this repository's ci_baseline (seconds = CI-equivalents x cpu_s_median), so a faster machine buys the same search per CI-equivalent, and every challenger record carries budget_ci_equiv, ci_baseline_cpu_s and the derived budget_s. call_timeout stays in seconds: a safety timeout, not a budget. 59.73 and 9.96 are the former 120 s and 20 s converted with the flask dev baseline (2.009 s, corpus/flask-dev/ci_baseline.json); Task B2 re-derives them from the real baselines."
+ ],
+ "challenger": {
+  "search": "src",
+  "budget_ci_equiv": 59.73,
+  "max_targets": 8,
+  "k": 3,
+  "call_timeout": 5,
+  "techniques": [
+   "property",
+   "differential",
+   "fuzz"
+  ],
+  "max_examples": 300,
+  "test_args": [
+   "tests"
+  ],
+  "fuzz_time_per_target_ci_equiv": 9.96,
+  "factories": {
+   "Command": "importlib.import_module('click').Command('rcca')",
+   "Group": "importlib.import_module('click').Group('rcca')",
+   "Context": "importlib.import_module('click').Context(importlib.import_module('click').Command('rcca'))",
+   "Parameter": "importlib.import_module('click').Option(['--rcca'])",
+   "Option": "importlib.import_module('click').Option(['--rcca'])",
+   "Argument": "importlib.import_module('click').Argument(['rcca'])"
+  },
+  "suite_timeout": 300
+ }
+}
