@@ -24,13 +24,4 @@ tune partition authored by claude, codex and a local Qwen).
 
     python -m pytest -q --ignore=tests/test_tune.py      # 286 pass, 8 skip
 
-`tests/test_tune.py` does not collect: its line 10 imports `tests.test_analyze` and `tests/` has no
-`__init__.py`. Secrets live in `.env` (gitignored).
 
-## Sharing the corpus
-
-`corpus/` is ~10 GB, of which 9.6 GB is regenerable and should not be copied: `envs/` (8.5 GB, built
-by `corpus/envs.py` from pinned specs), `tools/` (a venv) and `repos/` (public clones at the base
-commits in `tasks.jsonl`). What cannot be regenerated is the agent output, since the agents are
-nondeterministic: about 59 MB, near 10 MB compressed. Note that publishing `oracle/` ends the
-blinding of the hidden oracle for any later use of this corpus.
